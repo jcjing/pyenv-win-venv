@@ -208,3 +208,49 @@ pyenv-venv help install
     Save and restart the shell.
 
 **Note:** If you want the CLI to search for a `.python-version` file by traversing from the current working directory to the root till it finds the file, use `pyenv-venv init root`
+
+# Note Git-bash
+  - for every Venv, need to copy/make a deactivate script
+
+  - Added to to .bashrc to allow for activate and deactivation
+
+  ```
+  # pyenv-venv functions for activating and deactivating
+  # Helper function to source activation script
+  function activate() {
+      source "$(cygpath -u "$PYENV_VENV_ENVS/$1/Scripts/activate")"
+  }
+
+  # Helper function to source deactivation script
+  function deactivate() {
+      if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+          source "$(cygpath -u "$VIRTUAL_ENV/Scripts/deactivate")"
+      fi
+  }
+
+  pyenv-venv() {
+      if [[ "$1" == "activate" ]]; then
+          if (( $# < 2 )); then
+              printf "Usage: pyenv-venv activate <env_name>\n\n"
+              printf "Parameters:\nenv_name   name of the installed virtualenv\n\n"
+              printf "Example: pyenv-venv activate test_env\n"
+          else
+              activate "$2"
+          fi
+      elif [[ "$1" == "deactivate" ]]; then
+          deactivate
+      elif [[ "$1" == "init" ]]; then
+          echo "init"
+      else
+          command pyenv-venv "$@"
+      fi
+  }
+
+  python() {
+      if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+          winpty python.exe "$@"
+      else
+          command python "$@"
+      fi
+  }
+  ```

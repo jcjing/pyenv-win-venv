@@ -20,10 +20,15 @@ Param(
 )
 
 # Auto-detect the shell
-if ($MyInvocation.MyCommand.CommandType -eq "ExternalScript") {
-    $invokedShell = "bat"
-} else {
+# if ($MyInvocation.MyCommand.CommandType -eq "ExternalScript") {
+#     $invokedShell = "bat"
+# } else {
+#     $invokedShell = "ps1"
+# }
+if ($PSVersionTable) {
     $invokedShell = "ps1"
+} else {
+    $invokedShell = "bat"
 }
 
 $app_dir = "$HOME\.pyenv-win-venv"
