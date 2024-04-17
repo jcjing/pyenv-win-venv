@@ -227,7 +227,7 @@ pyenv-venv help install
       VIRTUAL_ENV_PROMPT="[$1]"
       export VIRTUAL_ENV_PROMPT
   }
-  
+
   # Helper function to source deactivation script
   function deactivate_helper() {
       if [[ -n "${VIRTUAL_ENV:-}" ]]; then
@@ -235,7 +235,30 @@ pyenv-venv help install
           deactivate
       fi
   }
+
+  # Helper function for finding .python-version file
+  function init_helper() {
+      file_name=".python-version"
+      search_dir=$(pwd)
+      if [[ -f "$search_dir/$file_name" ]]; then
+          PV_INIT=$(<"$search_dir/$file_name")
+          export PV_INIT
+          return 0
+      fi
   
+      while [[ $(dirname "$search_dir") != "/" ]]; do
+          search_dir=$(dirname "$search_dir")
+  
+          if [[ -f "$search_dir/$file_name" ]]; then
+              PV_INIT=$(<"$search_dir/$file_name")
+              export PV_INIT
+              return 0
+          fi
+      done
+  
+      return 1
+  }
+
   pyenv-venv() {
       if [[ "$1" == "activate" ]]; then
           if (( $# < 2 )); then
@@ -248,7 +271,12 @@ pyenv-venv help install
       elif [[ "$1" == "deactivate" ]]; then
           deactivate_helper
       elif [[ "$1" == "init" ]]; then
-          echo "init"
+          init_helper
+          if [[ -n "${PV_INIT:-}" ]]; then
+              deactivate_helper
+              activate_helper "$PV_INIT"
+              unset PV_INIT
+          fi
       else
           command pyenv-venv "$@"
       fi
