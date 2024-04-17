@@ -217,17 +217,25 @@ pyenv-venv help install
   ```
   # pyenv-venv functions for activating and deactivating
   # Helper function to source activation script
-  function activate() {
+  function activate_helper() {
+      # source the activation script
       source "$(cygpath -u "$PYENV_VENV_ENVS/$1/Scripts/activate")"
+      # don't use the shell prompt from the activation script
+      PS1=$_OLD_VIRTUAL_PS1
+      export PS1
+      # change the venv_prompt to [env]
+      VIRTUAL_ENV_PROMPT="[$1]"
+      export VIRTUAL_ENV_PROMPT
   }
-
+  
   # Helper function to source deactivation script
-  function deactivate() {
+  function deactivate_helper() {
       if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-          source "$(cygpath -u "$VIRTUAL_ENV/Scripts/deactivate")"
+          # set from activation script
+          deactivate
       fi
   }
-
+  
   pyenv-venv() {
       if [[ "$1" == "activate" ]]; then
           if (( $# < 2 )); then
@@ -235,10 +243,10 @@ pyenv-venv help install
               printf "Parameters:\nenv_name   name of the installed virtualenv\n\n"
               printf "Example: pyenv-venv activate test_env\n"
           else
-              activate "$2"
+              activate_helper "$2"
           fi
       elif [[ "$1" == "deactivate" ]]; then
-          deactivate
+          deactivate_helper
       elif [[ "$1" == "init" ]]; then
           echo "init"
       else
