@@ -31,7 +31,7 @@ if ($PSVersionTable) {
     $invokedShell = "bat"
 }
 
-$app_dir = "$HOME\.pyenv-win-venv"
+$app_dir = Resolve-Path "$PSScriptRoot" | Split-Path
 $app_env_dir = "$app_dir\envs"
 $cli_version = Get-Content "$app_dir\.version"
 
@@ -252,7 +252,8 @@ function  main {
         }
     }
     else { 
-        Write-Host "Command is not valid. Run `"pyenv-win-venv help`" for the HelpMenu" }
+        Write-Host "Command is not valid. Run `"pyenv-win-venv help`" for the HelpMenu" 
+    }
 }
 
 
@@ -333,7 +334,7 @@ Function Remove-PyEnvVenvVars() {
 Function Remove-PyEnvVenvProfile() {
     $CurrentProfile = Get-Content $Profile
     $UpdatedProfile = $CurrentProfile.Replace("pyenv-venv init", "")
-    Set-Content -Path  $Profile -Value $UpdatedProfile
+    Set-Content -Path $Profile -Value $UpdatedProfile
 }
 
 # Function to write debug log
